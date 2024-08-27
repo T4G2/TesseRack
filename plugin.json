@@ -1,0 +1,29 @@
+{
+  "slug": "Teserack",
+  "name": "Teserack",
+  "version": "2.0.0",
+  "license": "proprietary",
+  "brand": "Teserack",
+  "author": "Patrik Baso",
+  "authorEmail": "ptrkbaso@gmail.com",
+  "authorUrl": "",
+  "pluginUrl": "",
+  "manualUrl": "",
+  "sourceUrl": "",
+  "donateUrl": "",
+  "changelogUrl": "",
+  "modules": [
+    {
+      "slug": "NLMmk3",
+      "name": "NLMmk3",
+      "description": "Driver for Novation Launchpad Mini mk3",
+      "tags": [
+        "sequencer",
+        "mixer",
+        "midi",
+        "controller",
+        "arpeggiator"
+      ]
+    }
+  ]
+}
