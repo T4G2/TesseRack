@@ -140,9 +140,14 @@ namespace nl {
     };
 
 
-    Color NL_tableToRGBColor(uint8_t index) {
+    Color convertTableToRGBColor(uint8_t index) {
         const uint8_t* colorIn256Range = COLORTABLE[index];
         return Color::RGB(colorIn256Range[0]/2, colorIn256Range[1]/2, colorIn256Range[2]/2);
+    }
+
+    Color1f convertTableTo1fRangeColor(uint8_t index) {
+        const uint8_t* colorIn256Range = COLORTABLE[index];
+        return Color1f{colorIn256Range[0]/255.0f, colorIn256Range[1]/255.0f, colorIn256Range[2]/255.0f};
     }
 
 } // namespace nl

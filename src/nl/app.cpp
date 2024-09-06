@@ -19,7 +19,7 @@ namespace nl {
         }   
     }
 
-    void App::render(Driver driver)
+    void App::render(Driver& driver)
     {
         driver.renderer.clear();
         drumSequencerView.renderDrums(driver, drumSeqModules);

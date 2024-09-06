@@ -20,7 +20,7 @@ namespace nl {
         void reinitDrumSequencers( std::vector<rack::Module *> drumSeqExpanders);
         // ...
 
-        void render(Driver driver);
+        void render(Driver& driver);
     };
 
 } // namespace nl

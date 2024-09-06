@@ -13,6 +13,14 @@ namespace nl {
         RGB = 3
     };
 
+
+    struct Color1f {
+        float r;
+        float g;
+        float b;
+
+    };
+
     class Color {
         public:
 

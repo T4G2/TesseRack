@@ -14,9 +14,9 @@ namespace nl {
     public:
         DrumSequencerView() = default;
 
-        void renderDrums(Driver driver, std::vector<rack::Module*> drumSeqModules);
+        void renderDrums(Driver& driver, std::vector<rack::Module*> drumSeqModules);
 
 
-        void renderModuleMiniatures(Driver driver, std::vector<rack::Module*> drumSeqModules);
+        void renderModuleMiniatures(Driver& driver, std::vector<rack::Module*> drumSeqModules);
     };
 }
