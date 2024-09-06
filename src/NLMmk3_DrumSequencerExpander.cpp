@@ -73,8 +73,16 @@ struct NLMmk3_DrumSequencerExpander : Module
 		}
 	}
 
+
+	void processParams(const ProcessArgs &args) {
+
+	}
+
 	void process(const ProcessArgs &args) override
 	{
+		if ((args.frame % 64) == 0) {
+  			processParams(args);
+		}
 	}
 };
 

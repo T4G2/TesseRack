@@ -4,6 +4,7 @@
 namespace nl {
 
     void nl::DrumSequencerView::renderDrums(Driver& driver, std::vector<rack::Module*> drumSeqModules) {
+        driver.renderer.setColor(Color::flash(3,2), 6, 9);
         renderModuleMiniatures(driver, drumSeqModules);
 
     }

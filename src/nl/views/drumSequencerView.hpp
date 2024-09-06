@@ -11,12 +11,19 @@ namespace nl {
 
 
     class DrumSequencerView: public View {
-    public:
-        DrumSequencerView() = default;
+        private:
+            int paramDrawOffset = 0;
+        public:
 
-        void renderDrums(Driver& driver, std::vector<rack::Module*> drumSeqModules);
+        
+
+            DrumSequencerView() = default;
+
+            void renderDrums(Driver& driver, std::vector<rack::Module*> drumSeqModules);
 
 
-        void renderModuleMiniatures(Driver& driver, std::vector<rack::Module*> drumSeqModules);
-    };
+            void renderModuleMiniatures(Driver& driver, std::vector<rack::Module*> drumSeqModules);
+
+        
+        };
 }

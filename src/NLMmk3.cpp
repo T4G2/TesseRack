@@ -17,6 +17,10 @@ const std::set<Model *> allowedSubmodules = {
     // ...
 };
 
+struct DrumSequencerData {
+    float lastParamValue = -1.f;
+};
+
 struct NLMmk3 : rack::Module
 {
     enum ParamId
@@ -45,6 +49,7 @@ struct NLMmk3 : rack::Module
     rack::midi::Output output;
 
     std::map<Model *, std::vector<Module *>> expanders;
+    std::vector<DrumSequencerData> drumSequencerData;
 
     nl::Driver driver;
     nl::App app;
@@ -53,8 +58,6 @@ struct NLMmk3 : rack::Module
     bool initialized = false;
 
     bool reinitExpanderBuffer[2] = {false, false};
-
-
 
     /* #region INITIALZE */
 public:
@@ -184,7 +187,8 @@ public:
         setExpandersConnectedLights(0.f);
         DEBUG("Clearing expanders");
         printAllExpanders();
-        this->expanders = {};
+        expanders = {};
+        drumSequencerData = {};
 
         DEBUG("Collecting expanders:");
         Module *module = getRightExpander().module;
@@ -201,6 +205,12 @@ public:
                     this->expanders[module->getModel()] = {};
                 }
                 this->expanders[module->getModel()].push_back(module);
+
+                if (module->getModel() == modelNLMmk3_DrumSequencerExpander)
+                {
+                    
+                    drumSequencerData.push_back(DrumSequencerData());
+                }
             }
             module = module->getRightExpander().module;
         }
@@ -236,7 +246,6 @@ public:
         collectAllExpanders();
         printAllExpanders();
 
-
         app.reinit(this->expanders);
         rerender();
     }
@@ -268,20 +277,43 @@ public:
     }
     /* #endregion */
 
+    /* #region PROCESS */
+    void processParams(const ProcessArgs &args)
+    {
+        if (isExpanderChanged())
+        {
+            onExpanderConfigurationChange();
+        }
+
+
+        // update drum sequencers data
+        for (size_t i = 0; i < drumSequencerData.size(); i++)
+        {
+            float paramValue = expanders[modelNLMmk3_DrumSequencerExpander][i]->getParam(0).getValue();
+            DrumSequencerData &data = drumSequencerData[i];
+            if (data.lastParamValue != paramValue)
+            {
+                data.lastParamValue = paramValue;
+                // send data to drum sequencer
+                rerender();
+            }
+        }
+    }
+
     void process(const ProcessArgs &args) override
     {
+        if ((args.frame % 64) == 0)
+        {
+            processParams(args);
+        }
+
         if (!initialized)
         {
             initializeMidi();
             initialized = true;
         }
-
-        if (isExpanderChanged())
-        {
-            onExpanderConfigurationChange();
-        }
-        
     }
+    /* #endregion */
 };
 
 struct NLMmk3Widget : ModuleWidget
