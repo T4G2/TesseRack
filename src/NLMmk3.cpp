@@ -6,12 +6,13 @@
 #include <set>
 
 #include "nl/driver.hpp"
+#include "nl/app.hpp"
 #include "expansion.hpp"
 
 const std::regex IN_MIDI_NAME_REGEX("^MIDIIN2 \\(LPMiniMK3 MIDI\\).*$");
 const std::regex OUT_MIDI_NAME_REGEX("^LPMiniMK3 MIDI.*$");
 
-const std::set<Model*> allowedSubmodules = {
+const std::set<Model *> allowedSubmodules = {
     modelNLMmk3_DrumSequencerExpander
     // ...
 };
@@ -43,13 +44,17 @@ struct NLMmk3 : rack::Module
     rack::midi::Input input;
     rack::midi::Output output;
 
-    std::map<Model*, std::vector<Module*>> expanders;
+    std::map<Model *, std::vector<Module *>> expanders;
 
     nl::Driver driver;
+    nl::App app;
+
     // MessageSystem messageSystem;
     bool initialized = false;
 
     bool reinitExpanderBuffer[2] = {false, false};
+
+
 
     /* #region INITIALZE */
 public:
@@ -73,6 +78,7 @@ public:
         getRightExpander().consumerMessage = &reinitExpanderBuffer[1];
 
         // Initialize MIDI
+        app = nl::App();
     }
 
     bool areDriversInitialized()
@@ -127,15 +133,15 @@ public:
             driver = nl::Driver(&input, &output);
             driver.initProgrammerMode();
 
-            const nl::Color colorTable = nl::Color::table(5);
-            const nl::Color colorFlash = nl::Color::flash(5, 0);
-            const nl::Color colorPulse = nl::Color::pulse(64, 32);
-            const nl::Color colorRGB = nl::Color::RGB(127, 0, 127);
+            // const nl::Color colorTable = nl::Color::table(5);
+            // const nl::Color colorFlash = nl::Color::flash(5, 0);
+            // const nl::Color colorPulse = nl::Color::pulse(64, 32);
+            // const nl::Color colorRGB = nl::Color::RGB(127, 0, 127);
 
-            driver.renderer.setColor(colorTable, 1, 1);
-            driver.renderer.setColor(colorFlash, 2, 2);
-            driver.renderer.setColor(colorPulse, 3, 3);
-            driver.renderer.setColor(colorRGB, 4, 4);
+            // driver.renderer.setColor(colorTable, 1, 1);
+            // driver.renderer.setColor(colorFlash, 2, 2);
+            // driver.renderer.setColor(colorPulse, 3, 3);
+            // driver.renderer.setColor(colorRGB, 4, 4);
 
             driver.renderer.flush();
             lights[LIGHT_LIGHT].setBrightness(1.f);
@@ -146,11 +152,13 @@ public:
 
     /* #region EXPAND */
 
-    void onExpanderChange(const ExpanderChangeEvent& e) override {
+    void onExpanderChange(const ExpanderChangeEvent &e) override
+    {
 
-		if ( e.side == 1) {
+        if (e.side == 1)
+        {
             DEBUG("ON EXPANDER CHANGE side right");
-            bool* value = (bool*) getRightExpander().producerMessage;
+            bool *value = (bool *)getRightExpander().producerMessage;
             *value = true;
 
             // no need to request flip, it will be done by the main module
@@ -165,7 +173,7 @@ public:
             auto val = it->second;
             for (auto module : val)
             {
-                //set connected to 0
+                // set connected to 0
                 module->getLight(0).setBrightness(setToVal);
             }
         }
@@ -179,14 +187,17 @@ public:
         this->expanders = {};
 
         DEBUG("Collecting expanders:");
-                Module *module = getRightExpander().module;
-        while (module != nullptr) {
-            if (allowedSubmodules.find(module->model) != allowedSubmodules.end()) {
+        Module *module = getRightExpander().module;
+        while (module != nullptr)
+        {
+            if (allowedSubmodules.find(module->model) != allowedSubmodules.end())
+            {
 
                 float colorParam = module->getParam(0).getValue();
-                DEBUG("\tFound expander: %s with color <%d>", module->model->name.c_str(), (int)colorParam); //g
-                
-                if (this->expanders.find(module->getModel()) == this->expanders.end()) {
+                DEBUG("\tFound expander: %s with color <%d>", module->model->name.c_str(), (int)colorParam); // g
+
+                if (this->expanders.find(module->getModel()) == this->expanders.end())
+                {
                     this->expanders[module->getModel()] = {};
                 }
                 this->expanders[module->getModel()].push_back(module);
@@ -201,14 +212,17 @@ public:
         DEBUG("EXPANDER INFO");
         DEBUG("Expander count: %lld", this->expanders.size());
 
-        for (auto it = this->expanders.begin(); it != this->expanders.end(); ++it) {
+        for (auto it = this->expanders.begin(); it != this->expanders.end(); ++it)
+        {
             auto key = it->first;
             auto val = it->second;
             DEBUG("Expander[%lld]: %s", val.size(), key->name.c_str());
 
-            for (auto module : val) {
+            for (auto module : val)
+            {
                 int color = -1;
-                if (module->getModel() == modelNLMmk3_DrumSequencerExpander) {
+                if (module->getModel() == modelNLMmk3_DrumSequencerExpander)
+                {
                     color = (int)module->getParam(0).getValue();
                 }
                 DEBUG("\t%s: color %d", module->model->name.c_str(), color);
@@ -221,6 +235,10 @@ public:
         DEBUG("ON EXPANDER CONFIGURATION CHANGE");
         collectAllExpanders();
         printAllExpanders();
+
+
+        app.reinit(this->expanders);
+        rerender();
     }
 
     bool isExpanderChanged()
@@ -234,6 +252,19 @@ public:
         }
 
         return false;
+    }
+
+    void onRemove() override
+    {
+        driver.disableProgrammerMode();
+    }
+
+    /* #endregion */
+
+    /* #region RENDER */
+    void rerender()
+    {
+        app.render(driver);
     }
     /* #endregion */
 
@@ -249,6 +280,7 @@ public:
         {
             onExpanderConfigurationChange();
         }
+        
     }
 };
 

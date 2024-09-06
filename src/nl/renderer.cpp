@@ -8,7 +8,7 @@
 namespace nl {
 
     void Renderer::setColor(Color color, uint8_t x, uint8_t y) {
-        if (x >= GRID_SIZE_X || y >= GRID_SIZE_Y) {
+        if (x > GRID_SIZE_X || y > GRID_SIZE_Y) {
             return;
         }
 

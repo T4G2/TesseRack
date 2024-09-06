@@ -40,9 +40,14 @@ struct NLMmk3_DrumSequencerExpander : Module {
 			DEBUG("ON EXPANDER CHANGE side left/right");
 			Module* module = getLeftExpander().module;
 
-
+			int counter = 0;
+			const int MAX_EXPANDERS = 256;
 			while  (module != nullptr) {
-				
+				counter++;
+				if (counter > MAX_EXPANDERS) {
+					DEBUG("ERROR: Too many expanders -> Not Fixed Bug :/");
+					return;
+				}
 				if (module->getModel() == modelNLMmk3) {
 					// set the newly needed value
 					bool* value = (bool*) module->getRightExpander().producerMessage;
