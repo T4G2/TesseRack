@@ -13,3 +13,6 @@ extern Plugin* pluginInstance;
 // extern Model* modelTemplate;
 extern Model* modelNLMmk3;
 
+ extern Model* modelNLMmk3_DrumSequencerExpander;
+
+

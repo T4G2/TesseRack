@@ -24,6 +24,14 @@
         "controller",
         "arpeggiator"
       ]
+    },
+    {
+      "slug": "NLMmk3_DrumSequencerExpander",
+      "name": "NLMmk3_DrumSequencerExpander",
+      "description": "Drum Sequencer Expander for NLM mk3",
+      "tags": [
+        "Sequencer"
+      ]
     }
   ]
 }

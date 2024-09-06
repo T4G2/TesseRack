@@ -1,11 +1,11 @@
 #include "plugin.hpp"
 
 
-Plugin* pluginInstance;
+rack::Plugin* pluginInstance;
 
 // extern Model* modelNovaPad;
 
-extern Model* modelTemplate;
+extern rack::Model* modelTemplate;
 
 void init(Plugin* p) {
 	pluginInstance = p;
@@ -14,6 +14,8 @@ void init(Plugin* p) {
 	// p->addModel(modelMyModule);
 	// p->addModel(modelTemplate);
 	p->addModel(modelNLMmk3);
+	p->addModel(modelNLMmk3_DrumSequencerExpander);
+
 	// Any other plugin initialization may go here.
 	// As an alternative, consider lazy-loading assets and lookup tables when your module is created to reduce startup times of Rack.
 }
