@@ -3,10 +3,12 @@
 
 namespace nl {
 
+    class App;
+
     class View {
     public:
         View() = default;
-        //virtual void render(Driver driver) = 0;
+        virtual void render(App& app) = 0;
     };
 
 }

@@ -88,6 +88,7 @@ public:
     {
         return input.getDeviceId() >= 0 && output.getDeviceId() >= 0;
     }
+
     void initializeMidi()
     {
         INFO("Initializing NLMmk3 module:");
@@ -131,24 +132,18 @@ public:
             INFO("\tSelected output device: %s", output.getDeviceName(selectedOutputDeviceId).c_str());
         }
 
-        if (areDriversInitialized())
+        if (!areDriversInitialized())
         {
-            driver = nl::Driver(&input, &output);
-            driver.initProgrammerMode();
-
-            // const nl::Color colorTable = nl::Color::table(5);
-            // const nl::Color colorFlash = nl::Color::flash(5, 0);
-            // const nl::Color colorPulse = nl::Color::pulse(64, 32);
-            // const nl::Color colorRGB = nl::Color::RGB(127, 0, 127);
-
-            // driver.renderer.setColor(colorTable, 1, 1);
-            // driver.renderer.setColor(colorFlash, 2, 2);
-            // driver.renderer.setColor(colorPulse, 3, 3);
-            // driver.renderer.setColor(colorRGB, 4, 4);
-
-            driver.renderer.flush();
-            lights[LIGHT_LIGHT].setBrightness(1.f);
+            WARN("MIDI devices not found");
+            return;
         }
+
+        driver = nl::Driver(&input, &output);
+        driver.initProgrammerMode();
+
+        driver.renderer.flush();
+        lights[LIGHT_LIGHT].setBrightness(1.f);
+    
     }
 
     /* #endregion */
@@ -246,7 +241,13 @@ public:
         collectAllExpanders();
         printAllExpanders();
 
-        app.reinit(this->expanders);
+        app.reinit(driver,this->expanders);
+
+        if (!areDriversInitialized())
+        {
+            return;
+        }
+
         rerender();
     }
 
@@ -265,6 +266,12 @@ public:
 
     void onRemove() override
     {
+
+        if (!areDriversInitialized())
+        {
+            return;
+        }
+
         driver.disableProgrammerMode();
     }
 
@@ -273,7 +280,7 @@ public:
     /* #region RENDER */
     void rerender()
     {
-        app.render(driver);
+        app.render();
     }
     /* #endregion */
 
@@ -285,6 +292,10 @@ public:
             onExpanderConfigurationChange();
         }
 
+        if (!areDriversInitialized())
+        {
+            return;
+        }
 
         // update drum sequencers data
         for (size_t i = 0; i < drumSequencerData.size(); i++)

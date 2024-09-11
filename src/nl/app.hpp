@@ -3,7 +3,6 @@
 #include <vector>
 
 #include "rack.hpp"
-
 #include "views/drumSequencerView.hpp"
 
 namespace nl {
@@ -12,15 +11,19 @@ namespace nl {
     public:
 
         DrumSequencerView drumSequencerView;
+        Driver *driver;
         std::vector<rack::Module*> drumSeqModules = {};
 
         App() = default;
 
-        void reinit(std::map<rack::Model *, std::vector<rack::Module *>> expanders);
+        void reinit(Driver &driverRef, std::map<rack::Model *, std::vector<rack::Module *>> expanders);
         void reinitDrumSequencers( std::vector<rack::Module *> drumSeqExpanders);
         // ...
 
-        void render(Driver& driver);
+        // template <typename T: View>
+        // void registerView(T view)
+
+        void render();
     };
 
 } // namespace nl

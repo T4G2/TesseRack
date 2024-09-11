@@ -4,9 +4,10 @@
 
 namespace nl {
 
-    void App::reinit(std::map<rack::Model *, std::vector<rack::Module *>> expanders)
+    void App::reinit(Driver &driverRef, std::map<rack::Model*, std::vector<rack::Module*>> expanders)
     {
         std::vector<rack::Module *> drumSeqExpanders = expanders[modelNLMmk3_DrumSequencerExpander];
+        driver = &driverRef;
         reinitDrumSequencers(drumSeqExpanders);
     }
 
@@ -19,10 +20,12 @@ namespace nl {
         }   
     }
 
-    void App::render(Driver& driver)
+    void App::render()
     {
-        driver.renderer.clear();
-        drumSequencerView.renderDrums(driver, drumSeqModules);
-        driver.renderer.flush();
+        driver->renderer.clear();
+
+        // Select later
+        drumSequencerView.render(*this);
+        driver->renderer.flush();
     }
 } // namespace nl
